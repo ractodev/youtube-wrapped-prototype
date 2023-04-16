@@ -1,0 +1,5 @@
+config/*
+!config/.gitkeep
+history/*
+!history/.gitkeep
+**/__pycache__/

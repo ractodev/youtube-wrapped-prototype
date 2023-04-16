@@ -24,7 +24,7 @@ This project helps you analyze your YouTube watch history, such as calculating t
 
 ## Setup
 1. Clone this repository.
-2. Create a `config.py` file in the project root folder with the following content:
+2. Create a `config.py` file in the `config` folder with the following content:
 ```python
 API_KEY = 'your-api-key-here'
 ```

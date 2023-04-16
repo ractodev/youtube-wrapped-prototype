@@ -32,4 +32,5 @@ API_KEY = 'your-api-key-here'
 
 ## Usage
 1. Make sure your `watch-history.html` file is placed in the history folder.
-2. Run `python watch_times.py` in your terminal or command prompt. The script will process your watch history and display the results.
+2. Make sure you have created a `config.py` containing your API key, and that it's placed in the config folder.
+3. Run `python watch_times.py` in your terminal or command prompt. The script will process your watch history and display the results.

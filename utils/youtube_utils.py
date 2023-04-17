@@ -32,6 +32,7 @@ def get_video_information(youtube, video_ids):
             video_info[video_id] = {
                 "title": item["snippet"]["title"],
                 "duration": isodate.parse_duration(item["contentDetails"]["duration"]),
+                "channel_name": item["snippet"]["channelTitle"],
             }
     except googleapiclient.errors.HttpError as e:
         print(f"An error occurred: {e}")

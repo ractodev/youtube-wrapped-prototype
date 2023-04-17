@@ -59,11 +59,15 @@ def main():
             pbar.update(len(video_ids_batch))
 
     # Calculate total watch time
+    channel_count = collections.defaultdict(int)  # Add this line to count channel views
     for video_id in watch_history:
         if video_id in video_info:
             duration = video_info[video_id]['duration']
             total_watch_time += duration
             video_count[video_id] += 1
+
+            channel_name = video_info[video_id]['channel_name']  # Retrieve the channel_name
+            channel_count[channel_name] += 1  # Increment the channel views count
 
     print(f"\nTotal watch time: {total_watch_time.total_seconds() / 60:.1f} minutes watched")
     print(f"Total number of videos watched: {len(watch_history)}")
@@ -75,6 +79,12 @@ def main():
         if video_id in video_info:
             title = video_info[video_id]['title']
             print(f"{i}. {title} ({count} views)")
+
+    # Display the top 5 channels
+    print("\nTop 5 channels:")
+    top_channels = sorted(channel_count.items(), key=lambda x: x[1], reverse=True)[:5]
+    for i, (channel_name, count) in enumerate(top_channels, start=1):
+        print(f"{i}. {channel_name} ({count} views)")
 
 if __name__ == "__main__":
     main()

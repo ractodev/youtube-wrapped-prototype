@@ -75,6 +75,9 @@ def cache_request(youtube, video_ids):
             # Add a timestamp to the video data
             data['timestamp'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
 
+            # Cache the channel name
+            data['channel_name'] = data['channel_name']
+
             cache_video_data(user_email, video_id, data)
 
     # Build video_info from cache data and newly fetched data
@@ -83,14 +86,16 @@ def cache_request(youtube, video_ids):
             try:
                 video_info[video_id] = {
                     'duration': timedelta(seconds=isodate.parse_duration(data_from_cache[video_id]['duration']).total_seconds()),
-                    'title': data_from_cache[video_id]['title']
+                    'title': data_from_cache[video_id]['title'],
+                    'channel_name': data_from_cache[video_id]['channel_name']  # Retrieve the channel name
                 }
             except isodate.isoerror.ISO8601Error:
                 pass
         elif video_id in video_data:
             video_info[video_id] = {
                 'duration': timedelta(seconds=isodate.parse_duration(video_data[video_id]['duration']).total_seconds()),
-                'title': video_data[video_id]['title']
+                'title': video_data[video_id]['title'],
+                'channel_name': video_data[video_id]['channel_name']  # Retrieve the channel name
             }
 
     return video_info

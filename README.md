@@ -13,7 +13,7 @@ _Note: Since there is currently no YouTube API that allows insights on a user's 
 3. Click on "All YouTube and YouTube Music data included" and deselect all other options except "history" > "watch-history.html".
 4. Click "Next step" and then click "Create export".
 5. Download the generated archive when it's ready.
-6. Extract the `watch-history.html` file from the archive and place it in the `history` folder of this project.
+6. Extract the `watch-history.html` file from the archive and place it in the `data` folder of this project.
 
 ### YouTube Data API Key
 
@@ -51,6 +51,7 @@ USER_ID = 'your-user-id-here' # can be whatever you want, firebase uses this id 
 
 ## Usage
 
-1. Make sure your `watch-history.html` file is placed in the history folder.
+1. Make sure your `watch-history.html` file is placed in the data folder.
 2. Make sure you have created a `config.py` containing your API key, and that it's placed in the config folder.
+3. Run `cd src` to move to the source directory.
 3. Run `python watch_times.py` in your terminal or command prompt. The script will process your watch history and display the results.

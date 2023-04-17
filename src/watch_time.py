@@ -11,22 +11,17 @@ Functions:
               watch time and most watched videos.
 """
 
-import os
-import sys
-import time
-from collections import Counter
-from datetime import timedelta
+# Necessary imports
+from utils.imports import *
 
-import googleapiclient.discovery
-import isodate
-from bs4 import BeautifulSoup
-from tqdm import tqdm
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from config.credentials import *
-from utils.firebase import cache_request
+# Local modules
+from src.firebase import cache_request
 from src.pre_processing import preprocess_watch_history
-from utils.youtube_utils import get_video_information, get_watch_history
+from src.youtube_utils import get_video_information, get_watch_history
+
+# Credentials
+from config.credentials import *
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Build Youtube API client
 def authenticate(api_key):
@@ -35,7 +30,7 @@ def authenticate(api_key):
     return googleapiclient.discovery.build(service, version, developerKey = api_key)
     
 def main():
-    extracted_video_ids_path = '../data/extracted_video_ids.txt'
+    extracted_video_ids_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'extracted_video_ids.txt')
     if not os.path.exists(extracted_video_ids_path):
         preprocess_watch_history()
 

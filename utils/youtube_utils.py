@@ -8,10 +8,8 @@ Functions:
     - get_watch_history(): Retrieves the user's watch history from a file path and returns it as a list.
 """
 
-import isodate
-import googleapiclient.errors
-
-from datetime import timedelta
+# Necessary imports
+from utils.imports import *
 
 def get_video_information(youtube, video_ids):
     video_info = {}

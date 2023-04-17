@@ -11,8 +11,8 @@ Functions:
     - preprocess_watch_history(): Orchestrates the extracting- and writing process.
 """
 
-from bs4 import BeautifulSoup
-import os
+# Necessary imports
+from utils.imports import *
 
 def extract_video_ids(file_path):
     if not os.path.exists(file_path):
@@ -30,7 +30,9 @@ def save_video_ids(video_ids, output_file):
     with open(output_file, 'w', encoding='utf-8') as file:
         file.writelines(f"{video_id}\n" for video_id in video_ids)
 
-def preprocess_watch_history(input_file='../data/watch-history.html', output_file='history/extracted_video_ids.txt'):
+def preprocess_watch_history():
+    input_file='../data/watch_history.html'
+    output_file='../data/extracted_video_ids.txt'
     try:
         print("Extracting video IDs from Google Takeout watch history...")
         video_ids = extract_video_ids(input_file)

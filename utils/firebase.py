@@ -10,16 +10,14 @@ Functions:
     - cache_request(): Caches video information in Firebase if not already cached.
 """
 
-import os
-import sys
-import json
-import isodate
-import requests
-from datetime import datetime, timedelta
+# Necessary imports
+from utils.imports import *
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Local modules
 from config.credentials import *
 from utils.youtube_utils import get_video_information
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 def cache_request(youtube, video_ids):
     user_email = USER_ID.replace('@', '-').replace('.', '-')

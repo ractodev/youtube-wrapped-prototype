@@ -9,7 +9,15 @@ Functions:
 """
 
 # Necessary imports
+import os
+import sys
+
+# Add the parent directory to sys.path to import local modules
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# Local modules
 from utils.imports import *
+
 
 def get_video_information(youtube, video_ids):
     video_info = {}

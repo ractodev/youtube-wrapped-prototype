@@ -44,6 +44,7 @@ _Note: Since there is currently no YouTube API that allows insights on a user's 
 YOUTUBE_API_KEY = 'your-youtube-api-key-here'
 FIREBASE_DB_URL = 'your-firebase-db-url-here'
 FIREBASE_API_KEY = 'your-firebase-api-key-here'
+USER_ID = 'your-user-id-here' # can be whatever you want, firebase uses this id as the name for the collection
 ```
 
 3. Run `pip install -r requirements.txt` to install the required packages.

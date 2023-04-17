@@ -38,7 +38,7 @@ _Note: Since there is currently no YouTube API that allows insights on a user's 
 ## Setup
 
 1. Clone this repository.
-2. Create a `config.py` file in the `config` folder with the following content:
+2. Create a `credentials.py` file in the `config` folder with the following content:
 
 ```python
 YOUTUBE_API_KEY = 'your-youtube-api-key-here'
@@ -52,6 +52,6 @@ USER_ID = 'your-user-id-here' # can be whatever you want, firebase uses this id 
 ## Usage
 
 1. Make sure your `watch-history.html` file is placed in the data folder.
-2. Make sure you have created a `config.py` containing your API key, and that it's placed in the config folder.
+2. Make sure you have created a `credentials.py` containing your API key, and that it's placed in the config folder.
 3. Run `cd src` to move to the source directory.
 3. Run `python watch_times.py` in your terminal or command prompt. The script will process your watch history and display the results.

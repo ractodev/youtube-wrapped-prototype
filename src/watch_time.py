@@ -12,16 +12,21 @@ Functions:
 """
 
 # Necessary imports
-from utils.imports import *
+import os
+import sys
+
+# Add the parent directory to sys.path to import local modules
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Local modules
-from src.firebase import cache_request
-from src.pre_processing import preprocess_watch_history
-from src.youtube_utils import get_video_information, get_watch_history
+from utils.imports import *
+from utils.firebase import cache_request
+from utils.youtube_utils import get_video_information, get_watch_history
+from pre_processing import preprocess_watch_history
 
 # Credentials
 from config.credentials import *
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 
 # Build Youtube API client
 def authenticate(api_key):
@@ -30,7 +35,7 @@ def authenticate(api_key):
     return googleapiclient.discovery.build(service, version, developerKey = api_key)
     
 def main():
-    extracted_video_ids_path = os.path.join(os.path.dirname(__file__), '..', 'data', 'extracted_video_ids.txt')
+    extracted_video_ids_path = '../data/extracted_video_ids.txt'
     if not os.path.exists(extracted_video_ids_path):
         preprocess_watch_history()
 
@@ -40,32 +45,36 @@ def main():
     watch_history = get_watch_history(extracted_video_ids_path)
 
     total_watch_time = timedelta()
-    video_durations = {}
-    most_watched = Counter(watch_history).most_common(10)
+    video_count = collections.defaultdict(int)
 
-    # Generate progress bar for video information processing
+    # Get video information from cache or Youtube API
     video_info = {}
-    num_batches = (len(watch_history) + 49) // 50  # Calculate the number of batches, rounding up
+    batch_size = 50
+    num_batches = (len(watch_history) + batch_size - 1) // batch_size
     with tqdm(total=len(watch_history), unit='videos', desc="Processing watch history") as pbar:
-        for i in range(0, len(watch_history), 50):
-            video_ids = watch_history[i:i + 50]
-            video_info_batch = cache_request(youtube, video_ids)
-            video_durations.update({video_id: info['duration'] for video_id, info in video_info_batch.items()})
+        for i in range(0, len(watch_history), batch_size):
+            video_ids_batch = watch_history[i:i + batch_size]
+            video_info_batch = cache_request(youtube, video_ids_batch)
             video_info.update(video_info_batch)
+            pbar.update(len(video_ids_batch))
 
-            # Update the progress bar with the number of video IDs processed in the current batch
-            pbar.update(len(video_ids))
-    
-    print("Top 10 most watched youtube videos:")
-    for video_id, count in most_watched:
-        title = video_info[video_id]['title']
-        print(f"\t *{title} - Watched {count} times.")
+    # Calculate total watch time
+    for video_id in watch_history:
+        if video_id in video_info:
+            duration = video_info[video_id]['duration']
+            total_watch_time += duration
+            video_count[video_id] += 1
 
-    for video_id, count in most_watched:
-        duration = video_durations.get(video_id, timedelta())
-        total_watch_time += duration * count
+    print(f"\nTotal watch time: {total_watch_time.total_seconds() / 60:.1f} minutes watched")
+    print(f"Total number of videos watched: {len(watch_history)}")
 
-    print(f"\nTotal time spent watching YouTube videos: {total_watch_time}")
+    # Display the top 10 most-watched videos
+    print("\nTop 10 videos:")
+    top_videos = sorted(video_count.items(), key=lambda x: x[1], reverse=True)[:10]
+    for i, (video_id, count) in enumerate(top_videos, start=1):
+        if video_id in video_info:
+            title = video_info[video_id]['title']
+            print(f"{i}. {title} ({count} views)")
 
 if __name__ == "__main__":
     main()

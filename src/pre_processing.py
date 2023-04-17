@@ -12,7 +12,14 @@ Functions:
 """
 
 # Necessary imports
+import os
+import sys
+
+# Add the parent directory to sys.path to import local modules
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from utils.imports import *
+
 
 def extract_video_ids(file_path):
     if not os.path.exists(file_path):

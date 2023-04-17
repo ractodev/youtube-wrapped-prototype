@@ -10,24 +10,23 @@ Functions:
     - cache_request(): Caches video information in Firebase if not already cached.
 """
 
+import os
+import sys
 import json
 import isodate
 import requests
 from datetime import datetime, timedelta
 
-from config import config
-from youtube_utils import get_video_information
-
-firebase_api_key = config.FIREBASE_API_KEY
-firebase_db_url = config.FIREBASE_DB_URL
-user_id = config.USER_ID
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from config.credentials import *
+from utils.youtube_utils import get_video_information
 
 def cache_request(youtube, video_ids):
-    user_email = user_id.replace('@', '-').replace('.', '-')
+    user_email = USER_ID.replace('@', '-').replace('.', '-')
     video_info = {}
     for video_id in video_ids:
         # Check if the video_id is in Firebase cache
-        url = f'{firebase_db_url}/{user_email}/{video_id}.json?auth={firebase_api_key}'
+        url = f'{FIREBASE_DB_URL}/{user_email}/{video_id}.json?auth={FIREBASE_API_KEY}'
         response = requests.get(url)
         video_data_from_cache = response.json()
 

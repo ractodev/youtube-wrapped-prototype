@@ -1,3 +1,15 @@
+"""
+firebase.py
+
+This module caches video information in Firebase using the user's id as the key. 
+Cached video entries include duration, title, and timestamp. The timestamp acts 
+as a TTL of 24 hours, and entries older than the TTL are updated by requesting 
+the video information from the YouTube API.
+
+Functions:
+    - cache_request(): Caches video information in Firebase if not already cached.
+"""
+
 import json
 import isodate
 import requests

@@ -1,3 +1,16 @@
+"""
+watch_time.py:
+
+This file calculates total watch time and most watched videos on YouTube using Google APIs. 
+Watch history is extracted from a Google Takeout file, video IDs are cached, and video info 
+is requested from the YouTube API. Results are cached in Firebase and printed to console.
+
+Functions:
+    - authenticate(api_key): Builds a Youtube API client with the provided API key.
+    - main(): Orchestrates the program by calling the necessary functions to calculate the user's
+              watch time and most watched videos.
+"""
+
 import os
 import time
 from collections import Counter

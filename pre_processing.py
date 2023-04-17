@@ -1,3 +1,16 @@
+"""
+pre_processing.py:
+
+This module extracts video IDs from a Google Takeout watch history HTML file
+and saves them to a text file. The extracted video IDs can be used to retrieve
+video information from the YouTube API for future runs, thus speeding up the program.
+
+Functions:
+    - extract_video_ids(): Extracts video IDs from a Google Takeout watch history HTML file.
+    - save_video_ids(): Saves a list of video IDs to a text file.
+    - preprocess_watch_history(): Orchestrates the extracting- and writing process.
+"""
+
 from bs4 import BeautifulSoup
 import os
 

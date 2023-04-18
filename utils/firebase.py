@@ -67,7 +67,7 @@ def get_uncached_video_ids(video_ids, data_from_cache):
     return uncached_video_ids
 
 
-def cache_video_data(user_email, video_id, video_data):
+async def cache_video_data_async(user_email, video_id, video_data):
     """
     Caches video information in Firebase for a given video ID.
 
@@ -78,10 +78,11 @@ def cache_video_data(user_email, video_id, video_data):
     """
 
     url = f'{FIREBASE_DB_URL}/{user_email}/{video_id}.json?auth={FIREBASE_API_KEY}'
-    response = requests.put(url, json.dumps(video_data))
+    async with httpx.AsyncClient() as client:
+        await client.put(url, json=video_data)
 
 
-def cache_request(youtube, video_ids):
+async def cache_request(youtube, video_ids):
     """
     Caches video information in Firebase for a given list of video IDs. 
 
@@ -103,25 +104,32 @@ def cache_request(youtube, video_ids):
 
     # Check if the video_ids are in Firebase cache
     url = f'{FIREBASE_DB_URL}/{user_email}.json?auth={FIREBASE_API_KEY}'
-    response = requests.get(url)
+    async with httpx.AsyncClient() as client:
+        response = await client.get(url)
     data_from_cache = response.json()
 
     if data_from_cache is None:
         data_from_cache = {}
 
+    # Get uncached_video_ids
     uncached_video_ids = get_uncached_video_ids(video_ids, data_from_cache)
 
     # If there are uncached videos, request the video information from YouTube API
     if uncached_video_ids:
-        video_data = get_video_information(youtube, uncached_video_ids)
+        uncached_video_data = get_video_information(
+            youtube, uncached_video_ids)
 
         # Update the cache with the new video information
-        for video_id, data in video_data.items():
-            data['duration'] = isodate.duration_isoformat(data['duration'])
-            data['timestamp'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
-            data['channel_name'] = data['channel_name']
-            data['category'] = data.get('category', 'Unknown')
-            cache_video_data(user_email, video_id, data)
+        async with httpx.AsyncClient() as client:
+            tasks = []
+            for video_id, data in uncached_video_data.items():
+                data['duration'] = isodate.duration_isoformat(data['duration'])
+                data['timestamp'] = datetime.now().strftime(
+                    "%Y-%m-%dT%H:%M:%S.%f")
+                data['channel_name'] = data['channel_name']
+                data['category'] = data.get('category', 'Unknown')
+                tasks.append(cache_video_data(user_email, video_id, data))
+            await asyncio.gather(*tasks)
 
     # Build video_info from cache data and newly fetched data
     for video_id in video_ids:
@@ -135,12 +143,12 @@ def cache_request(youtube, video_ids):
                 }
             except isodate.isoerror.ISO8601Error:
                 pass
-        elif video_id in video_data:
+        elif video_id in uncached_video_data:
             video_info[video_id] = {
-                'duration': timedelta(seconds=isodate.parse_duration(video_data[video_id]['duration']).total_seconds()),
-                'title': video_data[video_id]['title'],
-                'channel_name': video_data[video_id]['channel_name'],
-                'category': video_data[video_id]['category']
+                'duration': timedelta(seconds=isodate.parse_duration(uncached_video_data[video_id]['duration']).total_seconds()),
+                'title': uncached_video_data[video_id]['title'],
+                'channel_name': uncached_video_data[video_id]['channel_name'],
+                'category': uncached_video_data[video_id]['category']
             }
 
     return video_info

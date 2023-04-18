@@ -55,7 +55,7 @@ def retrieve_watch_history():
     return get_watch_history(extracted_video_ids_path)
 
 
-def retrieve_video_info(youtube, watch_history):
+async def retrieve_video_info(youtube, watch_history):
     """
     Retrieves video information such as title and duration for a list of video IDs using the YouTube API.
 
@@ -72,7 +72,7 @@ def retrieve_video_info(youtube, watch_history):
     with tqdm(total=len(watch_history), unit='videos', desc="Processing watch history") as pbar:
         for i in range(0, len(watch_history), batch_size):
             video_ids_batch = watch_history[i:i + batch_size]
-            video_info_batch = cache_request(youtube, video_ids_batch)
+            video_info_batch = await cache_request(youtube, video_ids_batch)
             video_info.update(video_info_batch)
             pbar.update(len(video_ids_batch))
 
@@ -167,7 +167,7 @@ def display_top_items(item_count, item_info, item_label, x):
         print(f"{i}. {item_name} ({count} {item_label})")
 
 
-def main():
+async def main():
     """
     Orchestrates the program by calling the necessary functions to calculate the user's watch time and most watched videos.
 
@@ -180,7 +180,7 @@ def main():
 
     youtube = authenticate(YOUTUBE_API_KEY)
     watch_history = retrieve_watch_history()
-    video_info = retrieve_video_info(youtube, watch_history)
+    video_info = await retrieve_video_info(youtube, watch_history)
     total_watch_time, video_count, channel_count, category_count = calculate_stats(
         watch_history, video_info)
     display_results(watch_history, total_watch_time, video_count,
@@ -188,4 +188,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

@@ -13,7 +13,7 @@ _Note: Since there is currently no YouTube API that allows insights on a user's 
 3. Click on "All YouTube and YouTube Music data included" and deselect all other options except "history" > "watch-history.html".
 4. Click "Next step" and then click "Create export".
 5. Download the generated archive when it's ready.
-6. Extract the `watch-history.html` file from the archive and place it in the `data` folder of this project.
+6. Extract the `watch-history.html` file from the archive and place it in the `data` folder of this project. If you have downloaded your Takeout data in any other language, rename the corresponding file to **watch-history.html**.
 
 ### YouTube Data API Key
 

@@ -3,3 +3,6 @@ config/*
 data/*
 !data/.gitkeep
 **/__pycache__/
+pylint_report.txt
+.pylintrc
+.DS_Store

@@ -2,42 +2,59 @@
 youtube_utils.py:
 
 This module provides helper functions to interact with the YouTube Data API v3.
-
-Functions:
-    - get_video_information(youtube, video_ids): Fetches video information such as title, duration, and category 
-      for a list of video IDs using the YouTube API. Returns a dictionary of video IDs and their corresponding information.
-    - get_watch_history(file_path): Retrieves the user's watch history from a file path and returns it as a list.
-    - get_category_names(youtube, video_info): Returns a dictionary of category IDs and their corresponding 
-      names based on a dictionary of video information.
-    - get_video_details(youtube, video_ids): Helper function for `get_video_information()` that retrieves video details 
-      such as title, duration, channel name, and category ID for a list of video IDs using the YouTube API. 
-      Returns a dictionary of video IDs and their corresponding details.
 """
 
+# autopep8: off
 # Necessary imports
 import os
-import sys
+import sys 
 
 # Add the parent directory to sys.path to import local modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-# Local modules
 from utils.imports import *
+# autopep8: on
 
 
 def get_video_information(youtube, video_ids):
+    """
+    Fetches video information such as title, duration, and category for a list of video IDs using the YouTube API.
+
+    Args:
+        - youtube: An authenticated instance of the `googleapiclient.discovery.Resource` class for the YouTube API.
+        - video_ids (list): A list of video IDs to retrieve information for.
+
+    Returns:
+        - video_info (dict): A dictionary containing video IDs as keys and dictionaries containing video information as values. 
+        Each dictionary of video information contains the following keys: 'title', 'duration', 'channel_name', 'category'.
+    """
+
     video_info = get_video_details(youtube, video_ids)
     category_names = get_category_names(youtube, video_info)
-    
+
     for video_id, info in video_info.items():
         category_id = info["category_id"]
-        info["category"] = category_names.get(category_id, f"Unknown Category ({category_id})")
+        info["category"] = category_names.get(
+            category_id, f"Unknown Category ({category_id})")
 
     return video_info
 
+
 def get_video_details(youtube, video_ids):
+    """
+    Helper function for `get_video_information()` that retrieves video details such as title, duration, 
+    channel name, and category ID for a list of video IDs using the YouTube API.
+
+    Args:
+        - youtube: An authenticated instance of the `googleapiclient.discovery.Resource` class for the YouTube API.
+        - video_ids (list): A list of video IDs to retrieve details for.
+
+    Returns:
+        - video_info (dict): A dictionary containing video IDs as keys and dictionaries containing video details as values. 
+        Each dictionary of video details contains the following keys: 'title', 'duration', 'channel_name', 'category_id'.
+    """
+
     video_info = {}
-    
+
     try:
         response = youtube.videos().list(
             part="snippet,contentDetails",
@@ -57,7 +74,20 @@ def get_video_details(youtube, video_ids):
 
     return video_info
 
+
 def get_category_names(youtube, video_info):
+    """
+    Returns a dictionary of category IDs and their corresponding names based on a dictionary of video information.
+
+    Args:
+        - youtube: An authenticated instance of the `googleapiclient.discovery.Resource` class for the YouTube API.
+        - video_info (dict): A dictionary containing video IDs as keys and dictionaries containing video information as values. 
+        Each dictionary of video information should contain the key 'category_id'.
+
+    Returns:
+        - category_names (dict): A dictionary containing category IDs as keys and category names as values.
+    """
+
     category_ids = {info["category_id"] for info in video_info.values()}
     category_names = {}
 
@@ -76,8 +106,17 @@ def get_category_names(youtube, video_info):
     return category_names
 
 
-
 def get_watch_history(file_path):
+    """
+    Retrieves the user's watch history from a file path and returns it as a list.
+
+    Args:
+        - file_path: A string representing the path to the watch history file.
+
+    Returns:
+        - watch_history (list): A list of video IDs representing the user's watch history.
+    """
+
     with open(file_path, 'r', encoding='utf-8') as file:
         watch_history = [line.strip() for line in file.readlines()]
     return watch_history

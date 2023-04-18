@@ -2,8 +2,8 @@
 firebase.py
 
 This module caches video information in Firebase using the user's id as the key.
-Cached video entries include duration, title, and timestamp. The timestamp acts
-as a TTL of 24 hours, and entries older than the TTL are updated by requesting
+Cached video entries include duration, title, channel name, category, and timestamp.
+The timestamp acts as a TTL of 24 hours, and entries older than the TTL are updated by requesting
 the video information from the YouTube API.
 
 Functions:
@@ -32,11 +32,17 @@ from config.credentials import *
 
 
 def is_video_cached(video_id, data_from_cache):
-    if not data_from_cache or video_id not in data_from_cache or 'timestamp' not in data_from_cache[video_id]:
+    required_attributes = ['timestamp', 'duration', 'title', 'channel_name', 'category']
+    if not data_from_cache or video_id not in data_from_cache:
         return False
+
+    for attribute in required_attributes:
+        if attribute not in data_from_cache[video_id]:
+            return False
 
     timestamp = datetime.strptime(data_from_cache[video_id]['timestamp'], "%Y-%m-%dT%H:%M:%S.%f")
     return datetime.now() - timestamp < timedelta(days=1)
+
 
 def get_uncached_video_ids(video_ids, data_from_cache):
     uncached_video_ids = []
@@ -75,8 +81,9 @@ def cache_request(youtube, video_ids):
             # Add a timestamp to the video data
             data['timestamp'] = datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")
 
-            # Cache the channel name
+            # Cache the channel name and category
             data['channel_name'] = data['channel_name']
+            data['category'] = data.get('category', 'Unknown')
 
             cache_video_data(user_email, video_id, data)
 
@@ -87,7 +94,8 @@ def cache_request(youtube, video_ids):
                 video_info[video_id] = {
                     'duration': timedelta(seconds=isodate.parse_duration(data_from_cache[video_id]['duration']).total_seconds()),
                     'title': data_from_cache[video_id]['title'],
-                    'channel_name': data_from_cache[video_id]['channel_name']  # Retrieve the channel name
+                    'channel_name': data_from_cache[video_id]['channel_name'],
+                    'category': data_from_cache[video_id].get('category', 'Unknown')  # Use .get() to handle the missing 'category' key
                 }
             except isodate.isoerror.ISO8601Error:
                 pass
@@ -95,7 +103,8 @@ def cache_request(youtube, video_ids):
             video_info[video_id] = {
                 'duration': timedelta(seconds=isodate.parse_duration(video_data[video_id]['duration']).total_seconds()),
                 'title': video_data[video_id]['title'],
-                'channel_name': video_data[video_id]['channel_name']  # Retrieve the channel name
+                'channel_name': video_data[video_id]['channel_name'],
+                'category': video_data[video_id]['category']
             }
 
     return video_info

@@ -72,7 +72,7 @@ def retrieve_video_info(youtube, watch_history):
     with tqdm(total=len(watch_history), unit='videos', desc="Processing watch history") as pbar:
         for i in range(0, len(watch_history), batch_size):
             video_ids_batch = watch_history[i:i + batch_size]
-            video_info_batch = cache_request(youtube, video_ids_batch)
+            video_info_batch = asyncio.run(cache_request(youtube, video_ids_batch))
             video_info.update(video_info_batch)
             pbar.update(len(video_ids_batch))
 

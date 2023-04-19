@@ -82,7 +82,7 @@ async def cache_video_data_async(user_email, video_id, video_data):
         await client.put(url, json=video_data)
 
 
-async def cache_request(youtube, video_ids):
+async def cache_request(youtube, video_ids, cache_function=cache_video_data_async):
     """
     Caches video information in Firebase for a given list of video IDs. 
 
@@ -128,7 +128,7 @@ async def cache_request(youtube, video_ids):
                     "%Y-%m-%dT%H:%M:%S.%f")
                 data['channel_name'] = data['channel_name']
                 data['category'] = data.get('category', 'Unknown')
-                tasks.append(cache_video_data(user_email, video_id, data))
+                tasks.append(cache_function(user_email, video_id, data))
             await asyncio.gather(*tasks)
 
     # Build video_info from cache data and newly fetched data

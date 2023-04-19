@@ -1,6 +1,7 @@
 # TODO List
 
 ## Upcoming Features
+
 - [ ] Find statistics on how long people usually watch a video and create an estimate of how long you have actually watched
 - [ ] Display a breakdown of user's most watched genres
 - [ ] Add multithreading for better performance
@@ -12,6 +13,8 @@
 ////////////////////////////////
 
 ## Ideas
+
+- [!!!] Change html input to json, this will greatly increase performance and skip additonal requests to featch channel name and video title.
 
 Proposed output design:
 
@@ -27,7 +30,7 @@ Top 10 videos:
 3. Video Title 3 (17 views)
 4. Video Title 4 (15 views)
 5. Video Title 5 (13 views)
-...
+   ...
 
 Top 5 channels:
 

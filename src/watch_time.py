@@ -16,7 +16,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from config.credentials import * 
 from pre_processing import preprocess_watch_history
 from utils.youtube_utils import get_video_information, get_watch_history
-from utils.firebase import cache_request
+from utils.firebase import *
 from utils.imports import *
 # autopep8: on
 
@@ -72,7 +72,7 @@ async def retrieve_video_info(youtube, watch_history):
     with tqdm(total=len(watch_history), unit='videos', desc="Processing watch history") as pbar:
         for i in range(0, len(watch_history), batch_size):
             video_ids_batch = watch_history[i:i + batch_size]
-            video_info_batch = await cache_request(youtube, video_ids_batch)
+            video_info_batch = await cache_request(youtube, video_ids_batch, cache_video_data_async)
             video_info.update(video_info_batch)
             pbar.update(len(video_ids_batch))
 

@@ -6,6 +6,7 @@
 - [ ] Display a breakdown of user's most watched genres
 - [ ] Add multithreading for better performance
 - [ ] Create web interface
+- [ ] Add perlin noise background in the web interface
 - [ ] Allow user to download their wrapped statistics in a pdf/jpg file
 
 ## Known Issues

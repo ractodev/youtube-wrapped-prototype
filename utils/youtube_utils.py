@@ -12,111 +12,23 @@ import sys
 # Add the parent directory to sys.path to import local modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from utils.imports import *
+from config.credentials import * # REMOVE
 # autopep8: on
 
-
-def get_video_information(youtube, video_ids):
-    """
-    Fetches video information such as title, duration, and category for a list of video IDs using the YouTube API.
-
-    Args:
-        - youtube: An authenticated instance of the `googleapiclient.discovery.Resource` class for the YouTube API.
-        - video_ids (list): A list of video IDs to retrieve information for.
-
-    Returns:
-        - video_info (dict): A dictionary containing video IDs as keys and dictionaries containing video information as values. 
-        Each dictionary of video information contains the following keys: 'title', 'duration', 'channel_name', 'category'.
-    """
-
-    video_info = get_video_details(youtube, video_ids)
-    category_names = get_category_names(youtube, video_info)
-
-    for video_id, info in video_info.items():
-        category_id = info["category_id"]
-        info["category"] = category_names.get(
-            category_id, f"Unknown Category ({category_id})")
-
-    return video_info
-
-
-def get_video_details(youtube, video_ids):
-    """
-    Helper function for `get_video_information()` that retrieves video details such as title, duration, 
-    channel name, and category ID for a list of video IDs using the YouTube API.
-
-    Args:
-        - youtube: An authenticated instance of the `googleapiclient.discovery.Resource` class for the YouTube API.
-        - video_ids (list): A list of video IDs to retrieve details for.
-
-    Returns:
-        - video_info (dict): A dictionary containing video IDs as keys and dictionaries containing video details as values. 
-        Each dictionary of video details contains the following keys: 'title', 'duration', 'channel_name', 'category_id'.
-    """
-
-    video_info = {}
-
+def get_video_duration(youtube, video_id):
     try:
-        response = youtube.videos().list(
-            part="snippet,contentDetails",
-            id=",".join(video_ids),
-        ).execute()
+        response = youtube.videos().list(part='contentDetails', id=video_id).execute()
+        duration = response['items'][0]['contentDetails']['duration']
+        return duration
+    except Exception as e:
+        logging.error(f"Error fetching duration for video ID {video_id}: {e}")
 
-        for item in response["items"]:
-            video_id = item["id"]
-            video_info[video_id] = {
-                "title": item["snippet"]["title"],
-                "duration": isodate.parse_duration(item["contentDetails"]["duration"]),
-                "channel_name": item["snippet"]["channelTitle"],
-                "category_id": item["snippet"]["categoryId"]
-            }
-    except googleapiclient.errors.HttpError as e:
-        print(f"An error occurred: {e}")
-
-    return video_info
-
-
-def get_category_names(youtube, video_info):
-    """
-    Returns a dictionary of category IDs and their corresponding names based on a dictionary of video information.
-
-    Args:
-        - youtube: An authenticated instance of the `googleapiclient.discovery.Resource` class for the YouTube API.
-        - video_info (dict): A dictionary containing video IDs as keys and dictionaries containing video information as values. 
-        Each dictionary of video information should contain the key 'category_id'.
-
-    Returns:
-        - category_names (dict): A dictionary containing category IDs as keys and category names as values.
-    """
-
-    category_ids = {info["category_id"] for info in video_info.values()}
-    category_names = {}
-
+def get_video_category(youtube, video_id):
     try:
-        category_response = youtube.videoCategories().list(
-            part="snippet",
-            id=",".join(category_ids),
-        ).execute()
-
-        for item in category_response["items"]:
-            category_id = item["id"]
-            category_names[category_id] = item["snippet"]["title"]
-    except googleapiclient.errors.HttpError as e:
-        print(f"An error occurred: {e}")
-
-    return category_names
-
-
-def get_watch_history(file_path):
-    """
-    Retrieves the user's watch history from a file path and returns it as a list.
-
-    Args:
-        - file_path: A string representing the path to the watch history file.
-
-    Returns:
-        - watch_history (list): A list of video IDs representing the user's watch history.
-    """
-
-    with open(file_path, 'r', encoding='utf-8') as file:
-        watch_history = [line.strip() for line in file.readlines()]
-    return watch_history
+        response = youtube.videos().list(part='snippet', id=video_id).execute()
+        category_id = response['items'][0]['snippet']['categoryId']
+        category_response = youtube.videoCategories().list(part='snippet', id=category_id).execute()
+        category_name = category_response['items'][0]['snippet']['title']
+        return category_name
+    except Exception as e:
+        logging.error(f"Error fetching category for video ID {video_id}: {e}")
